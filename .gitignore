@@ -39,3 +39,7 @@ htmlcov
 
 docker-compose.production.yml
 docker-compose.tournament.yml
+
+project/mortal/mortal_lib/libriichi.so
+project/mortal/mortal_lib/libriichi.pyd
+project/mortal/mortal_lib/mortal.pth
