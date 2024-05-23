@@ -457,8 +457,8 @@ class TenhouClient(Client):
                     if_tsumogiri = message[1].islower()
                     player_seat = self.decoder.get_enemy_seat(message)
                     if isinstance(self.player, MortalPlayer):
-                        # if there was no call before, add draw event
-                        if len(self.player.events) == 0 or self.player.events[-1]["actor"] != player_seat:
+                        assert len(self.player.events) > 0  # there is always start_game event
+                        if self.player.events[-1].get("actor") != player_seat:
                             self.player.events.append(mortal_helpers.draw_tile(player_id=player_seat, tile="?"))
 
                         self.player.events.append(mortal_helpers.discard_tile(
