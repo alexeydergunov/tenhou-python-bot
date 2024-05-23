@@ -2,10 +2,10 @@ from tenhou.client import TenhouClient
 from utils.logger import set_up_logging
 
 
-def connect_and_play():
+def connect_and_play(bot_config=None):
     logger = set_up_logging()
 
-    client = TenhouClient(logger)
+    client = TenhouClient(logger=logger, bot_config=bot_config)
     client.connect()
 
     try:
