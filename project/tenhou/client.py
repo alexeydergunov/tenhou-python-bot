@@ -228,6 +228,13 @@ class TenhouClient(Client):
 
             messages = self._get_multiple_messages()
 
+            # Log events every turn
+            if isinstance(self.player, MortalPlayer):
+                self.logger.info("=== Mortal events begin ===")
+                for event in self.player.events:
+                    self.logger.info(">>> %s", event)
+                self.logger.info("=== Mortal events end ===")
+
             if self.reconnected_messages:
                 messages = self.reconnected_messages + messages
                 self.reconnected_messages = None
