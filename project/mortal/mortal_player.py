@@ -3,6 +3,7 @@ from typing import Any, Optional
 from mahjong.constants import EAST, NORTH, WEST, SOUTH
 from mahjong.meld import Meld
 
+from game.ai.configs.bot_mortal import MortalConfig
 from game.ai.configs.default import BotDefaultConfig
 from game.table import Table
 from mortal.bot_single_action import Bot as MortalBot
@@ -15,6 +16,7 @@ from utils.decisions_logger import MeldPrint
 
 class MortalPlayer(Player):
     def __init__(self, table: Table, seat: int, dealer_seat: int, bot_config: Optional[BotDefaultConfig]):
+        assert isinstance(bot_config, MortalConfig)
         super().__init__(table, seat, dealer_seat, bot_config)
         self.events: list[MortalEvent] = []
         self.bot = MortalBot(player_id=seat)
