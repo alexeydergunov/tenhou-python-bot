@@ -99,6 +99,9 @@ class TenhouClient(Client):
             return False
 
     def start_game(self):
+        from mortal.mortal_player import MortalPlayer
+        import project.mortal.mortal_helpers as mortal_helpers
+
         log_link = ""
 
         # play in private or tournament lobby
@@ -351,16 +354,21 @@ class TenhouClient(Client):
                             TilesConverter.to_one_line_string([tile], print_aka_dora=self.table.has_aka_dora)
                         )
                     )
+                    # TODO add new dora to mortal
 
                 if "<REACH" in message and 'step="1"' in message:
                     who_called_riichi = self.decoder.parse_who_called_riichi(message)
                     self.table.add_called_riichi_step_one(who_called_riichi)
                     self.logger.info("Riichi called by {} player, step=1".format(who_called_riichi))
+                    if isinstance(self.player, MortalPlayer):
+                        self.player.events.append(mortal_helpers.declare_riichi(player_id=who_called_riichi))
 
                 if "<REACH" in message and 'step="2"' in message:
                     who_called_riichi = self.decoder.parse_who_called_riichi(message)
                     self.table.add_called_riichi_step_two(who_called_riichi)
                     self.logger.info("Riichi called by {} player, step=2".format(who_called_riichi))
+                    if isinstance(self.player, MortalPlayer):
+                        self.player.events.append(mortal_helpers.successful_riichi(player_id=who_called_riichi))
 
                 # the end of round
                 if "<AGARI" in message or "<RYUUKYOKU" in message:
@@ -372,6 +380,37 @@ class TenhouClient(Client):
                     meld = self.decoder.parse_meld(message)
                     self.table.add_called_meld(meld.who, meld)
                     self.logger.info("Meld: {} by {}".format(meld, meld.who))
+
+                    if isinstance(self.player, MortalPlayer):
+                        if meld.type == MeldPrint.CHI:
+                            self.player.events.append(mortal_helpers.chi(
+                                player_id=meld.who,
+                                tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
+                                chi_tiles=[mortal_helpers.convert_tile_to_mortal(tile_136=t) for t in meld.tiles],
+                            ))
+                        if meld.type == MeldPrint.PON:
+                            self.player.events.append(mortal_helpers.pon(
+                                player_id=meld.who,
+                                from_whom=meld.from_who,
+                                tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
+                            ))
+                        if meld.type == MeldPrint.KAN:
+                            if meld.opened:
+                                self.player.events.append(mortal_helpers.open_kan(
+                                    player_id=meld.who,
+                                    from_whom=meld.from_who,
+                                    tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
+                                ))
+                            else:
+                                self.player.events.append(mortal_helpers.closed_kan(
+                                    player_id=meld.who,
+                                    tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
+                                ))
+                        if meld.type == MeldPrint.SHOUMINKAN:
+                            self.player.events.append(mortal_helpers.added_kan(
+                                player_id=meld.who,
+                                tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
+                            ))
 
                     # tenhou confirmed that we called a meld
                     # we had to do discard after this
@@ -410,6 +449,16 @@ class TenhouClient(Client):
                     # <E21/> - discard from the hand
                     if_tsumogiri = message[1].islower()
                     player_seat = self.decoder.get_enemy_seat(message)
+                    if isinstance(self.player, MortalPlayer):
+                        # if there was no call before, add draw event
+                        if len(self.player.events) > 0 and self.player.events[-1]["actor"] != player_seat:
+                            self.player.events.append(mortal_helpers.draw_tile(player_id=player_seat, tile="?"))
+
+                        self.player.events.append(mortal_helpers.discard_tile(
+                            player_id=player_seat,
+                            tile=mortal_helpers.convert_tile_to_mortal(tile_136=tile),
+                            tsumogiri=if_tsumogiri,
+                        ))
 
                     # open hand suggestions
                     if "t=" in message:

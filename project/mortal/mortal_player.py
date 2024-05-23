@@ -22,9 +22,12 @@ class MortalPlayer(Player):
         self.bot = MortalBot(player_id=seat)
 
     def erase_state(self):
+        super().erase_state()
         self.events.clear()
 
     def init_hand(self, tiles: list[int]):
+        super().init_hand(tiles=tiles)
+
         round_wind: str = {
             EAST: "E",
             SOUTH: "S",
@@ -32,11 +35,11 @@ class MortalPlayer(Player):
             NORTH: "N",
         }[self.table.round_wind_tile]
         dora_marker: str = mortal_helpers.convert_tile_to_mortal(tile_136=self.table.dora_indicators[0])
-        round_id: int = (self.table.round_wind_number + 1) // 4
+        round_id: int = self.table.round_wind_number // 4 + 1
         honba: int = self.table.count_of_honba_sticks
         riichi_sticks: int = self.table.count_of_riichi_sticks
         dealer_id: int = self.dealer_seat
-        scores: list[int] = [player.scores for player in self.table.players]
+        scores: list[int] = [int(player.scores) for player in self.table.players]
         start_hands: list[list[str]] = [
             ["?"] * 13,
             ["?"] * 13,
@@ -58,11 +61,15 @@ class MortalPlayer(Player):
         self.events.append(event)
 
     def draw_tile(self, tile_136: int):
+        super().draw_tile(tile_136=tile_136)
+
         tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
         event = mortal_helpers.draw_tile(player_id=self.seat, tile=tile)
         self.events.append(event)
 
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
+        super().discard_tile(discard_tile=discard_tile, force_tsumogiri=force_tsumogiri)
+
         actions = self.bot.react_all(events=self.events, with_meta=True)
         assert actions[-1]["type"] == "dahai"
         discarded_tile: str = actions[-1]["pai"]
@@ -98,7 +105,8 @@ class MortalPlayer(Player):
             return None, None
 
         call_action = actions[-2]
-        assert call_action["type"] in {"chi", "pon", "daiminkan"}
+        if call_action["type"] not in {"chi", "pon", "daiminkan"}:
+            return None, None
         discard_action = actions[-1]
         discard_tile: int = mortal_helpers.convert_tile_from_mortal(discard_action["pai"])
 
