@@ -3,7 +3,7 @@ import logging
 import sys
 from typing import Any, Optional
 
-import mortal_lib.model as mortal_model
+import mortal.mortal_lib.model as mortal_model
 
 
 class Bot:

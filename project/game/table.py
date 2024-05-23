@@ -1,10 +1,8 @@
-from game.ai.configs.bot_mortal import MortalConfig
 from game.player import EnemyPlayer, Player
 from mahjong.constants import EAST, NORTH, SOUTH, WEST
 from mahjong.tile import Tile, TilesConverter
 from mahjong.utils import plus_dora
 
-from mortal.mortal_player import MortalPlayer
 from utils.decisions_logger import MeldPrint
 from utils.general import is_sangenpai
 
@@ -249,6 +247,8 @@ class Table:
         ), f"we have only 4 tiles in the game: {TilesConverter.to_one_line_string([tile])}"
 
     def _init_players(self, bot_config):
+        from .ai.configs.bot_mortal import MortalConfig
+        from mortal.mortal_player import MortalPlayer
         if isinstance(bot_config, MortalConfig):
             self.player = MortalPlayer(table=self, seat=0, dealer_seat=self.dealer_seat, bot_config=bot_config)
         else:

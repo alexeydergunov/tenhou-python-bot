@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from mahjong.constants import EAST, NORTH, WEST, SOUTH
 from mahjong.meld import Meld
@@ -17,8 +17,8 @@ from utils.decisions_logger import MeldPrint
 class MortalPlayer(Player):
     def __init__(self, table: Table, seat: int, dealer_seat: int, bot_config: Optional[BotDefaultConfig]):
         assert isinstance(bot_config, MortalConfig)
-        super().__init__(table, seat, dealer_seat, bot_config)
         self.events: list[MortalEvent] = []
+        super().__init__(table, seat, dealer_seat, bot_config)
         self.bot = MortalBot(player_id=seat)
 
     def erase_state(self):
