@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Optional
 
 from mahjong.constants import EAST, NORTH, WEST, SOUTH
@@ -18,12 +19,14 @@ class MortalPlayer(Player):
     def __init__(self, table: Table, seat: int, dealer_seat: int, bot_config: Optional[BotDefaultConfig]):
         assert isinstance(bot_config, MortalConfig)
         self.events: list[MortalEvent] = []
+        self.our_tiles_map: dict[str, list[int]] = defaultdict(list)
         super().__init__(table, seat, dealer_seat, bot_config)
         self.bot = MortalBot(player_id=seat)
 
     def erase_state(self):
         super().erase_state()
         self.events.clear()
+        self.our_tiles_map.clear()
 
     def init_hand(self, tiles: list[int]):
         super().init_hand(tiles=tiles)
@@ -46,7 +49,11 @@ class MortalPlayer(Player):
             ["?"] * 13,
             ["?"] * 13,
         ]
-        start_hands[self.seat] = [mortal_helpers.convert_tile_to_mortal(tile_136=tile_136) for tile_136 in tiles]
+        start_hands[self.seat].clear()
+        for tile_136 in tiles:
+            tile = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
+            start_hands[self.seat].append(tile)
+            self.our_tiles_map[tile].append(tile_136)
 
         event = mortal_helpers.start_hand(
             round_wind=round_wind,
@@ -64,6 +71,7 @@ class MortalPlayer(Player):
         super().draw_tile(tile_136=tile_136)
 
         tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
+        self.our_tiles_map[tile].append(tile_136)
         event = mortal_helpers.draw_tile(player_id=self.seat, tile=tile)
         self.events.append(event)
 
@@ -81,7 +89,8 @@ class MortalPlayer(Player):
         if with_riichi:
             # if not successful, will be cleared on next hand
             self.events.append(mortal_helpers.successful_riichi(player_id=self.seat))
-        return mortal_helpers.convert_tile_from_mortal(tile=discarded_tile), with_riichi
+        discarded_tile_136 = self.our_tiles_map[discarded_tile].pop()
+        return discarded_tile_136, with_riichi
 
     def should_call_kan(self, tile: int, open_kan: bool, from_riichi: bool = False):
         action = self.bot.react_one(events=self.events, with_meta=False)
@@ -108,7 +117,7 @@ class MortalPlayer(Player):
         if call_action["type"] not in {"chi", "pon", "daiminkan"}:
             return None, None
         discard_action = actions[-1]
-        discard_tile: int = mortal_helpers.convert_tile_from_mortal(discard_action["pai"])
+        discard_tile: int = self.our_tiles_map[discard_action["pai"]].pop()
 
         meld_type = {
             "chi": MeldPrint.CHI,
@@ -116,6 +125,6 @@ class MortalPlayer(Player):
             "daiminkan": MeldPrint.KAN,
         }[call_action["type"]]
 
-        consumed_tiles: list[int] = [mortal_helpers.convert_tile_from_mortal(tile=t) for t in call_action["consumed"]]
+        consumed_tiles: list[int] = [self.our_tiles_map[t].pop() for t in call_action["consumed"]]
         meld = Meld(meld_type=meld_type, tiles=consumed_tiles)
         return meld, discard_tile
