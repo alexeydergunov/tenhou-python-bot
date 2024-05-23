@@ -451,7 +451,7 @@ class TenhouClient(Client):
                     player_seat = self.decoder.get_enemy_seat(message)
                     if isinstance(self.player, MortalPlayer):
                         # if there was no call before, add draw event
-                        if len(self.player.events) > 0 and self.player.events[-1]["actor"] != player_seat:
+                        if len(self.player.events) == 0 or self.player.events[-1]["actor"] != player_seat:
                             self.player.events.append(mortal_helpers.draw_tile(player_id=player_seat, tile="?"))
 
                         self.player.events.append(mortal_helpers.discard_tile(
