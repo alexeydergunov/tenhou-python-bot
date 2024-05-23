@@ -459,7 +459,7 @@ class TenhouClient(Client):
                     if isinstance(self.player, MortalPlayer):
                         assert len(self.player.events) > 0  # there is always start_game event
                         if self.player.events[-1].get("actor") != player_seat:
-                            self.player.events.append(mortal_helpers.draw_tile(player_id=player_seat, tile="?"))
+                            self.player.events.append(mortal_helpers.draw_unknown_tile(player_id=player_seat))
 
                         self.player.events.append(mortal_helpers.discard_tile(
                             player_id=player_seat,

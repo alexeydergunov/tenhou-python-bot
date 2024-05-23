@@ -86,6 +86,11 @@ def draw_tile(player_id: int, tile: str) -> MortalEvent:
     return {"type": "tsumo", "actor": player_id, "pai": tile}
 
 
+def draw_unknown_tile(player_id: int) -> MortalEvent:
+    assert 0 <= player_id <= 3
+    return {"type": "tsumo", "actor": player_id, "pai": "?"}
+
+
 def discard_tile(player_id: int, tile: str, tsumogiri: bool) -> MortalEvent:
     assert 0 <= player_id <= 3
     assert tile in TILES
