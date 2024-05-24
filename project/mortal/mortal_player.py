@@ -92,7 +92,7 @@ class MortalPlayer(Player):
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
         self.logger.logger.info("Called discard_tile()")
         self.logger.logger.info("Last previous events:")
-        for event in self.events[-3:]:
+        for event in self.events[-12:]:
             self.logger.logger.info("> %s", event)
 
         action = self.bot.react_one(events=self.events, with_meta=True)
