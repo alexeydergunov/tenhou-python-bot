@@ -167,7 +167,7 @@ class MortalPlayer(Player):
 
         discard_action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot discard action: %s", discard_action)
-        discard_tile: int = self.our_tiles_map[discard_action["pai"]].pop()
+        discard_tile: int = self.our_tiles_map[discard_action["pai"]][-1]  # will be popped in discard_tile()
 
         consumed_tiles: list[int] = [self.our_tiles_map[t].pop() for t in call_action["consumed"]]
         meld = Meld(meld_type=meld_type, tiles=consumed_tiles + [tile])
