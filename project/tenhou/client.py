@@ -369,14 +369,16 @@ class TenhouClient(Client):
                     self.table.add_called_riichi_step_one(who_called_riichi)
                     self.logger.info("Riichi called by {} player, step=1".format(who_called_riichi))
                     if isinstance(self.player, MortalPlayer):
-                        self.player.events.append(mortal_helpers.declare_riichi(player_id=who_called_riichi))
+                        if self.player.seat != who_called_riichi:
+                            self.player.events.append(mortal_helpers.declare_riichi(player_id=who_called_riichi))
 
                 if "<REACH" in message and 'step="2"' in message:
                     who_called_riichi = self.decoder.parse_who_called_riichi(message)
                     self.table.add_called_riichi_step_two(who_called_riichi)
                     self.logger.info("Riichi called by {} player, step=2".format(who_called_riichi))
                     if isinstance(self.player, MortalPlayer):
-                        self.player.events.append(mortal_helpers.successful_riichi(player_id=who_called_riichi))
+                        if self.player.seat != who_called_riichi:
+                            self.player.events.append(mortal_helpers.successful_riichi(player_id=who_called_riichi))
 
                 # the end of round
                 if "<AGARI" in message or "<RYUUKYOKU" in message:
