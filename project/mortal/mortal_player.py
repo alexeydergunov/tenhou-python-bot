@@ -126,13 +126,19 @@ class MortalPlayer(Player):
         return action["type"] in {"ankan", "kakan", "daiminkan"}
 
     def should_call_win(self,
-                        tile: int,
+                        tile_136: int,
                         is_tsumo: bool,
                         enemy_seat: Optional[int] = None,
                         is_chankan: bool = False) -> bool:
         self.logger.logger.info("Called should_call_win()")
+        if is_tsumo:
+            # client first check win by tsumo, then actually draws tile
+            tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
+            self.events.append(mortal_helpers.draw_tile(player_id=self.seat, tile=tile))
         action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot action: %s", action)
+        if is_tsumo:
+            self.events.pop()
         return action["type"] == "hora"
 
     def should_call_kyuushu_kyuuhai(self) -> bool:
