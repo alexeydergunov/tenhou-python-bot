@@ -362,7 +362,10 @@ class TenhouClient(Client):
                             TilesConverter.to_one_line_string([tile], print_aka_dora=self.table.has_aka_dora)
                         )
                     )
-                    # TODO add new dora to mortal
+                    if isinstance(self.player, MortalPlayer):
+                        self.player.events.append(mortal_helpers.add_dora_marker(
+                            tile=mortal_helpers.convert_tile_to_mortal(tile_136=tile)
+                        ))
 
                 if "<REACH" in message and 'step="1"' in message:
                     who_called_riichi = self.decoder.parse_who_called_riichi(message)

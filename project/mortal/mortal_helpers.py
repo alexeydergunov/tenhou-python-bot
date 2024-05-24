@@ -162,3 +162,8 @@ def open_kan(player_id: int, from_whom: int, tile: str) -> MortalEvent:
     assert player_id != from_whom
     assert tile in TILES
     return {"type": "daiminkan", "actor": player_id, "target": from_whom, "pai": tile, "consumed": [tile, tile, tile]}
+
+
+def add_dora_marker(tile: str) -> MortalEvent:
+    assert tile in TILES
+    return {"type": "dora", "dora_marker": tile}
