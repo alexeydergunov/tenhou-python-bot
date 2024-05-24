@@ -29,7 +29,7 @@ class MortalPlayer(Player):
         for tile, tile_136_list in self.our_tiles_map.items():
             if len(tile_136_list) > 0:
                 tiles.extend([tile] * len(tile_136_list))
-        tiles.sort()
+        tiles.sort(key=lambda t: mortal_helpers.TILES.index(t))
         return tiles
 
     def erase_state(self):

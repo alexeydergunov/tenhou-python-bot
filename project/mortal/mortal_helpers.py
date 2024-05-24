@@ -3,10 +3,9 @@ from typing import Any
 from mahjong.constants import FIVE_RED_MAN, FIVE_RED_PIN, FIVE_RED_SOU
 
 TILES = [
-    "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
-    "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p",
-    "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
-    "5mr", "5pr", "5sr",
+    "1m", "2m", "3m", "4m", "5m", "5mr", "6m", "7m", "8m", "9m",  # "5[m,p,s]r" is a red five
+    "1p", "2p", "3p", "4p", "5p", "5pr", "6p", "7p", "8p", "9p",
+    "1s", "2s", "3s", "4s", "5s", "5sr", "6s", "7s", "8s", "9s",
     "E", "S", "W", "N",
     "P", "F", "C",  # white, greed, red
 ]
