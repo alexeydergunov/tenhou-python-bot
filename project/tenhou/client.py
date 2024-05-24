@@ -100,7 +100,7 @@ class TenhouClient(Client):
 
     def start_game(self):
         from mortal.mortal_player import MortalPlayer
-        import project.mortal.mortal_helpers as mortal_helpers
+        import mortal.mortal_helpers as mortal_helpers
 
         log_link = ""
 

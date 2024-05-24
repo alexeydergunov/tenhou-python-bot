@@ -9,9 +9,9 @@ from game.ai.configs.default import BotDefaultConfig
 from game.table import Table
 from mortal.bot_single_action import Bot as MortalBot
 from mortal.mortal_helpers import MortalEvent
-from project.game.player import Player
+from game.player import Player
 
-import project.mortal.mortal_helpers as mortal_helpers
+import mortal.mortal_helpers as mortal_helpers
 from utils.decisions_logger import MeldPrint
 
 
