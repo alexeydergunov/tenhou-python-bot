@@ -118,11 +118,15 @@ class MortalPlayer(Player):
         super().discard_tile(discard_tile=discarded_tile_136, force_tsumogiri=force_tsumogiri)  # maintain table state
         return discarded_tile_136, with_riichi
 
-    def should_call_kan(self, tile: int, open_kan: bool, from_riichi: bool = False):
+    def should_call_kan(self, tile: int, open_kan: bool, from_riichi: bool = False) -> Optional[str]:
         self.logger.logger.info("Called should_call_kan()")
         action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot action: %s", action)
-        return action["type"] in {"ankan", "kakan", "daiminkan"}
+        if action["type"] == "kakan":
+            return MeldPrint.SHOUMINKAN
+        if action["type"] in {"ankan", "daiminkan"}:
+            return MeldPrint.KAN
+        return None
 
     def should_call_win(self,
                         tile_136: int,
