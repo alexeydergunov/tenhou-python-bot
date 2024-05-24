@@ -135,9 +135,6 @@ class TenhouClient(Client):
             while self.looking_for_game:
                 self._random_sleep(1, 2)
 
-                if isinstance(self.player, MortalPlayer):
-                    self.player.log_our_tiles_map()
-
                 messages = self._get_multiple_messages()
                 for message in messages:
                     if "<REJOIN" in message:
@@ -231,12 +228,13 @@ class TenhouClient(Client):
 
             messages = self._get_multiple_messages()
 
-            # Log events every turn
+            # Log events and hand every turn
             if isinstance(self.player, MortalPlayer):
-                self.logger.info("=== Mortal events begin ===")
-                for event in self.player.events:
+                self.logger.info("=== Mortal last events begin ===")
+                for event in self.player.events[-20:]:
                     self.logger.info(">>> %s", event)
-                self.logger.info("=== Mortal events end ===")
+                self.logger.info("=== Mortal last events end ===")
+                self.logger.info("Our tiles: %s", self.player.get_our_tiles_list())
 
             if self.reconnected_messages:
                 messages = self.reconnected_messages + messages
