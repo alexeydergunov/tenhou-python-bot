@@ -79,6 +79,11 @@ class MortalPlayer(Player):
     def draw_tile(self, tile_136: int):
         super().draw_tile(tile_136=tile_136)
 
+        self.logger.logger.info("Called draw_tile()")
+        self.logger.logger.info("Last previous events:")
+        for event in self.events[-5:]:
+            self.logger.logger.info("> %s", event)
+
         tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
         self.our_tiles_map[tile].append(tile_136)
         event = mortal_helpers.draw_tile(player_id=self.seat, tile=tile)
@@ -87,7 +92,16 @@ class MortalPlayer(Player):
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
         super().discard_tile(discard_tile=discard_tile, force_tsumogiri=force_tsumogiri)
 
+        self.logger.logger.info("Called discard_tile()")
+        self.logger.logger.info("Last previous events:")
+        for event in self.events[-5:]:
+            self.logger.logger.info("> %s", event)
+
         actions = self.bot.react_all(events=self.events, with_meta=True)
+        self.logger.logger.info("Last previous actions:")
+        for action in actions[-5:]:
+            self.logger.logger.info("> %s", action)
+
         assert actions[-1]["type"] == "dahai"
         discarded_tile: str = actions[-1]["pai"]
         with_riichi: bool = (len(actions) > 1) and (actions[-2]["type"] == "reach")
@@ -118,7 +132,16 @@ class MortalPlayer(Player):
         return action["type"] == "ryukyoku"
 
     def try_to_call_meld(self, tile: int, is_kamicha_discard: bool) -> tuple[Optional[Meld], Optional[int]]:
+        self.logger.logger.info("Called try_to_call_meld()")
+        self.logger.logger.info("Last previous events:")
+        for event in self.events[-5:]:
+            self.logger.logger.info("> %s", event)
+
         actions = self.bot.react_all(events=self.events, with_meta=False)
+        self.logger.logger.info("Last previous actions:")
+        for action in actions[-5:]:
+            self.logger.logger.info("> %s", action)
+
         if len(actions) <= 1 or actions[-1]["type"] == "none":
             return None, None
 
