@@ -22,6 +22,7 @@ class MortalPlayer(Player):
         self.our_tiles_map: dict[str, list[int]] = defaultdict(list)
         super().__init__(table, seat, dealer_seat, bot_config)
         self.bot = MortalBot(player_id=seat)
+        self.ai = None  # disable old MahjongAI class, will use MortalBot instead
 
     def erase_state(self):
         super().erase_state()

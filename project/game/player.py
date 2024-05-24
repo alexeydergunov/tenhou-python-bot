@@ -184,7 +184,8 @@ class Player(PlayerInterface):
     def init_hand(self, tiles):
         self.tiles = tiles
 
-        self.ai.init_hand()
+        if self.ai:
+            self.ai.init_hand()
 
     def draw_tile(self, tile_136):
         context = [
@@ -192,13 +193,15 @@ class Player(PlayerInterface):
             f"Remaining tiles: {self.table.count_of_remaining_tiles}",
             f"Hand: {self.format_hand_for_print(tile_136)}",
         ]
-        if self.ai.open_hand_handler.current_strategy:
-            context.append(f"Current strategy: {self.ai.open_hand_handler.current_strategy}")
+        if self.ai:
+            if self.ai.open_hand_handler.current_strategy:
+                context.append(f"Current strategy: {self.ai.open_hand_handler.current_strategy}")
 
         self.logger.debug(log.DRAW, context=context)
 
         # it is important to recalculate all threats here
-        self.ai.defence.erase_threats_cache()
+        if self.ai:
+            self.ai.defence.erase_threats_cache()
 
         self.last_draw = tile_136
         self.tiles.append(tile_136)
@@ -206,9 +209,13 @@ class Player(PlayerInterface):
         # we need sort it to have a better string presentation
         self.tiles = sorted(self.tiles)
 
-        self.ai.draw_tile(tile_136)
+        if self.ai:
+            self.ai.draw_tile(tile_136)
 
     def discard_tile(self, discard_tile=None, force_tsumogiri=False):
+        if not self.ai:
+            return None, None
+
         if force_tsumogiri:
             tile_to_discard = discard_tile
             with_riichi = False
@@ -224,22 +231,32 @@ class Player(PlayerInterface):
         return tile_to_discard, with_riichi
 
     def should_call_kan(self, tile, open_kan, from_riichi=False):
+        if not self.ai:
+            return False
         self.ai.defence.erase_threats_cache()
         return self.ai.kan.should_call_kan(tile, open_kan, from_riichi)
 
     def should_call_win(self, tile, is_tsumo, enemy_seat=None, is_chankan=False):
+        if not self.ai:
+            return False
         self.ai.defence.erase_threats_cache()
         return self.ai.should_call_win(tile, is_tsumo, enemy_seat, is_chankan)
 
     def should_call_kyuushu_kyuuhai(self):
+        if not self.ai:
+            return False
         self.ai.defence.erase_threats_cache()
         return self.ai.should_call_kyuushu_kyuuhai()
 
     def try_to_call_meld(self, tile, is_kamicha_discard):
+        if not self.ai:
+            return None, None
         self.ai.defence.erase_threats_cache()
         return self.ai.try_to_call_meld(tile, is_kamicha_discard)
 
     def enemy_called_riichi(self, player_seat):
+        if not self.ai:
+            return
         self.ai.enemy_called_riichi(player_seat)
 
     def number_of_revealed_tiles(self, tile_34, closed_hand_34):
