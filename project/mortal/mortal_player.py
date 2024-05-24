@@ -90,8 +90,6 @@ class MortalPlayer(Player):
         self.events.append(event)
 
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
-        super().discard_tile(discard_tile=discard_tile, force_tsumogiri=force_tsumogiri)
-
         self.logger.logger.info("Called discard_tile()")
         self.logger.logger.info("Last previous events:")
         for event in self.events[-5:]:
@@ -117,6 +115,7 @@ class MortalPlayer(Player):
             self.events.append(mortal_helpers.successful_riichi(player_id=self.seat))
 
         discarded_tile_136 = self.our_tiles_map[discarded_tile].pop()
+        super().discard_tile(discard_tile=discarded_tile_136, force_tsumogiri=force_tsumogiri)  # maintain table state
         return discarded_tile_136, with_riichi
 
     def should_call_kan(self, tile: int, open_kan: bool, from_riichi: bool = False):

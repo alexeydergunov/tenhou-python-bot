@@ -213,14 +213,17 @@ class Player(PlayerInterface):
             self.ai.draw_tile(tile_136)
 
     def discard_tile(self, discard_tile=None, force_tsumogiri=False):
-        if not self.ai:
-            return None, None
-
         if force_tsumogiri:
             tile_to_discard = discard_tile
             with_riichi = False
         else:
-            tile_to_discard, with_riichi = self.ai.discard_tile(discard_tile)
+            if not self.ai:
+                # Mortal case
+                assert discard_tile is not None
+                tile_to_discard = discard_tile
+                with_riichi = None  # doesn't matter
+            else:
+                tile_to_discard, with_riichi = self.ai.discard_tile(discard_tile)
 
         is_tsumogiri = tile_to_discard == self.last_draw
         # it is important to use table method,
