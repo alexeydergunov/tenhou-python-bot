@@ -129,16 +129,31 @@ class MortalPlayer(Player):
                         tile_136: int,
                         is_tsumo: bool,
                         enemy_seat: Optional[int] = None,
-                        is_chankan: bool = False) -> bool:
+                        is_chankan: bool = False,
+                        is_tsumogiri: bool = False) -> bool:
         self.logger.logger.info("Called should_call_win()")
+        tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
+
+        # client first check win, then actually draws/discards tile
+        new_events = []
         if is_tsumo:
-            # client first check win by tsumo, then actually draws tile
-            tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
-            self.events.append(mortal_helpers.draw_tile(player_id=self.seat, tile=tile))
+            new_events.append(mortal_helpers.draw_tile(player_id=self.seat, tile=tile))
+        else:
+            assert 0 <= enemy_seat <= 3
+            assert enemy_seat != self.seat
+            if is_chankan:
+                new_events.append(mortal_helpers.added_kan(player_id=enemy_seat, tile=tile))
+            else:
+                new_events.append(mortal_helpers.draw_unknown_tile(player_id=enemy_seat))
+                new_events.append(mortal_helpers.discard_tile(player_id=enemy_seat, tile=tile, tsumogiri=is_tsumogiri))
+
+        self.events.extend(new_events)
         action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot action: %s", action)
-        if is_tsumo:
+
+        for _ in range(len(new_events)):
             self.events.pop()
+
         return action["type"] == "hora"
 
     def should_call_kyuushu_kyuuhai(self) -> bool:

@@ -443,20 +443,22 @@ class TenhouClient(Client):
 
                 # we win by other player's discard
                 if any(i in message for i in ron_win_suggestions):
-                    is_chankan = False
                     # enemy called shouminkan and we can win there
                     if self.decoder.is_opened_set_message(message):
                         meld = self.decoder.parse_meld(message)
                         tile = meld.called_tile
                         enemy_seat = meld.who
                         is_chankan = True
+                        is_tsumogiri = False
                     else:
                         tile = self.decoder.parse_tile(message)
                         enemy_seat = self.decoder.get_enemy_seat(message)
+                        is_chankan = False
+                        is_tsumogiri = message[1].islower()
 
                     self._random_sleep(1, 1.5)
 
-                    if main_player.should_call_win(tile, False, enemy_seat, is_chankan):
+                    if main_player.should_call_win(tile, False, enemy_seat, is_chankan, is_tsumogiri):
                         self._send_message('<N type="6" />')
                     else:
                         self._send_message("<N />")
@@ -466,7 +468,7 @@ class TenhouClient(Client):
 
                     # <e21/> - is tsumogiri
                     # <E21/> - discard from the hand
-                    if_tsumogiri = message[1].islower()
+                    is_tsumogiri = message[1].islower()
                     player_seat = self.decoder.get_enemy_seat(message)
                     if isinstance(self.player, MortalPlayer):
                         assert len(self.player.events) > 0  # there is always start_game event
@@ -476,7 +478,7 @@ class TenhouClient(Client):
                         self.player.events.append(mortal_helpers.discard_tile(
                             player_id=player_seat,
                             tile=mortal_helpers.convert_tile_to_mortal(tile_136=tile),
-                            tsumogiri=if_tsumogiri,
+                            tsumogiri=is_tsumogiri,
                         ))
 
                     # open hand suggestions
@@ -528,7 +530,7 @@ class TenhouClient(Client):
                         else:
                             self._send_message("<N />")
 
-                    self.table.add_discarded_tile(player_seat, tile, if_tsumogiri)
+                    self.table.add_discarded_tile(player_seat, tile, is_tsumogiri)
 
                 if "owari" in message:
                     values = self.decoder.parse_final_scores_and_uma(message)
