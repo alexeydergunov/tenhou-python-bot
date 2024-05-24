@@ -156,21 +156,19 @@ class MortalPlayer(Player):
         if call_action["type"] == "chi":
             self.events.append(mortal_helpers.chi(player_id=self.seat, tile=call_action["pai"], chi_tiles=call_action["consumed"]))
             meld_type = MeldPrint.CHI
-            discard_action = self.bot.react_one(events=self.events, with_meta=True)
         elif call_action["type"] == "pon":
             self.events.append(mortal_helpers.pon(player_id=self.seat, tile=call_action["pai"], from_whom=call_action["target"]))
             meld_type = MeldPrint.PON
-            discard_action = self.bot.react_one(events=self.events, with_meta=True)
         elif call_action["type"] == "daiminkan":
             self.events.append(mortal_helpers.open_kan(player_id=self.seat, tile=call_action["pai"], from_whom=call_action["target"]))
             meld_type = MeldPrint.KAN
-            discard_action = self.bot.react_one(events=self.events, with_meta=True)
         else:
             return None, None
 
+        discard_action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot discard action: %s", discard_action)
         discard_tile: int = self.our_tiles_map[discard_action["pai"]].pop()
 
         consumed_tiles: list[int] = [self.our_tiles_map[t].pop() for t in call_action["consumed"]]
-        meld = Meld(meld_type=meld_type, tiles=consumed_tiles)
+        meld = Meld(meld_type=meld_type, tiles=consumed_tiles + [tile])
         return meld, discard_tile
