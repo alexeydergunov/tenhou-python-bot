@@ -171,4 +171,6 @@ class MortalPlayer(Player):
 
         consumed_tiles: list[int] = [self.our_tiles_map[t].pop() for t in call_action["consumed"]]
         meld = Meld(meld_type=meld_type, tiles=consumed_tiles + [tile])
+
+        self.events.pop()  # will be added in a client when we get a message about meld
         return meld, discard_tile

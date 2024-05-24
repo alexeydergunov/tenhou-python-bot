@@ -366,7 +366,9 @@ class TenhouClient(Client):
 
                 if "<REACH" in message and 'step="1"' in message:
                     who_called_riichi = self.decoder.parse_who_called_riichi(message)
-                    self.table.add_called_riichi_step_one(who_called_riichi)
+                    if not isinstance(self.player, MortalPlayer):
+                        # don't maintain table state in case of Mortal
+                        self.table.add_called_riichi_step_one(who_called_riichi)
                     self.logger.info("Riichi called by {} player, step=1".format(who_called_riichi))
                     if isinstance(self.player, MortalPlayer):
                         if self.player.seat != who_called_riichi:
@@ -374,7 +376,9 @@ class TenhouClient(Client):
 
                 if "<REACH" in message and 'step="2"' in message:
                     who_called_riichi = self.decoder.parse_who_called_riichi(message)
-                    self.table.add_called_riichi_step_two(who_called_riichi)
+                    if not isinstance(self.player, MortalPlayer):
+                        # don't maintain table state in case of Mortal
+                        self.table.add_called_riichi_step_two(who_called_riichi)
                     self.logger.info("Riichi called by {} player, step=2".format(who_called_riichi))
                     if isinstance(self.player, MortalPlayer):
                         if self.player.seat != who_called_riichi:
