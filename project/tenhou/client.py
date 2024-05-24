@@ -664,15 +664,12 @@ class TenhouClient(Client):
         Set game related settings and
         return false, if we are trying to play 3 man game
         """
-        # need to find a better way to do it
-        rules = bin(int(game_type)).replace("0b", "")
-        while len(rules) <= 8:
-            rules = "0" + rules
+        rules_mask = int(game_type)
 
-        is_hanchan = rules[4] == "1"
-        is_open_tanyao = rules[5] == "0"
-        is_aka = rules[6] == "0"
-        is_sanma = rules[3] == "1"
+        is_hanchan = (rules_mask & 8) != 0
+        is_open_tanyao = (rules_mask & 4) == 0
+        is_aka = (rules_mask & 2) == 0
+        is_sanma = (rules_mask & 16) != 0
 
         if is_sanma:
             return False
@@ -683,7 +680,7 @@ class TenhouClient(Client):
         self.logger.info("Game settings:")
         self.logger.info("Aka dora: {}".format(self.table.has_aka_dora))
         self.logger.info("Open tanyao: {}".format(self.table.has_open_tanyao))
-        self.logger.info("Game type: {}".format(is_hanchan and "hanchan" or "tonpusen"))
+        self.logger.info("Game type: {}".format("hanchan" if is_hanchan else "tonpusen"))
 
         return True
 
