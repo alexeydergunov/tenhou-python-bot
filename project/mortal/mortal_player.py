@@ -24,6 +24,14 @@ class MortalPlayer(Player):
         self.bot = MortalBot(player_id=seat)
         self.ai = None  # disable old MahjongAI class, will use MortalBot instead
 
+    def log_our_tiles_map(self):
+        tiles = []
+        for tile, tile_136_list in self.our_tiles_map.items():
+            if len(tile_136_list) > 0:
+                tiles.extend([tile] * len(tile_136_list))
+        tiles.sort()
+        self.logger.logger.info("Our tiles: %s", tiles)
+
     def erase_state(self):
         super().erase_state()
         self.events.clear()

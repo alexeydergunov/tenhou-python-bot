@@ -135,6 +135,9 @@ class TenhouClient(Client):
             while self.looking_for_game:
                 self._random_sleep(1, 2)
 
+                if isinstance(self.player, MortalPlayer):
+                    self.player.log_our_tiles_map()
+
                 messages = self._get_multiple_messages()
                 for message in messages:
                     if "<REJOIN" in message:
