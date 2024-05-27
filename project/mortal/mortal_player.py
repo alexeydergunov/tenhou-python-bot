@@ -7,7 +7,7 @@ from mahjong.meld import Meld
 from game.ai.configs.bot_mortal import MortalConfig
 from game.ai.configs.default import BotDefaultConfig
 from game.table import Table
-from mortal.bot_single_action import Bot as MortalBot
+from mortal.mortal_bot import MortalBot
 from mortal.mortal_helpers import MortalEvent
 from game.player import Player
 
