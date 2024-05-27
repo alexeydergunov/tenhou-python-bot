@@ -277,6 +277,12 @@ class TenhouClient(Client):
                                 main_player.tiles.extend(tiles)
                             self.table.add_called_meld(x, item)
 
+                if isinstance(self.player, MortalPlayer):
+                    # returns seat or None if it's not an enemy draw
+                    enemy_draw_seat = self.decoder.try_parse_enemy_draw_message(message)
+                    if enemy_draw_seat is not None:
+                        self.player.events.append(mortal_helpers.draw_unknown_tile(player_id=enemy_draw_seat))
+
                 # draw tile message
                 if "<T" in message:
                     self._random_sleep(0.5, 1)
@@ -467,10 +473,6 @@ class TenhouClient(Client):
                     is_tsumogiri = message[1].islower()
                     player_seat = self.decoder.get_enemy_seat(message)
                     if isinstance(self.player, MortalPlayer):
-                        assert len(self.player.events) > 0  # there is always start_game event
-                        if self.player.events[-1].get("actor") != player_seat:
-                            self.player.events.append(mortal_helpers.draw_unknown_tile(player_id=player_seat))
-
                         self.player.events.append(mortal_helpers.discard_tile(
                             player_id=player_seat,
                             tile=mortal_helpers.convert_tile_to_mortal(tile_136=tile),

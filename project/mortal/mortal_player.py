@@ -147,7 +147,6 @@ class MortalPlayer(Player):
             if is_chankan:
                 new_events.append(mortal_helpers.added_kan(player_id=enemy_seat, tile=tile))
             else:
-                new_events.append(mortal_helpers.draw_unknown_tile(player_id=enemy_seat))
                 new_events.append(mortal_helpers.discard_tile(player_id=enemy_seat, tile=tile, tsumogiri=is_tsumogiri))
 
         self.events.extend(new_events)
