@@ -153,13 +153,13 @@ class MortalPlayer(Player):
 
         # when enemies declare open or added kans, kandora event comes before their discards, we need to remove it
         previous_kan_dora_event: Optional[MortalEvent] = None
-        if self.events[-1]["type"] == "tsumo" and self.events[-1]["actor"] == enemy_seat:
-            if self.events[-2]["type"] == "dora":
+        if self.events[-1]["type"] == "dora":
+            if self.events[-2]["type"] == "tsumo" and self.events[-2]["actor"] == enemy_seat:
                 if self.events[-3]["type"] in {"kakan", "daiminkan"} and self.events[-3]["actor"] == enemy_seat:
-                    self.logger.logger.info("Found sequence %s -> dora -> tsumo before player %s discard in win check, move dora event after discard",
+                    self.logger.logger.info("Found sequence %s -> tsumo -> dora before player %s discard in win check, temporarily delete dora event",
                                             self.events[-3]["type"], enemy_seat)
-                    previous_kan_dora_event = self.events[-2]
-                    self.events.pop(-2)
+                    previous_kan_dora_event = self.events[-1]
+                    self.events.pop()
 
         # client first check win, then actually draws/discards tile
         new_events = []
@@ -182,11 +182,11 @@ class MortalPlayer(Player):
         for _ in range(len(new_events)):
             self.events.pop()
 
-        # return to initial state
+        # return to initial state, kandora event will be moved after discard in client's code
         if previous_kan_dora_event is not None:
-            self.events.insert(-1, previous_kan_dora_event)
-            assert self.events[-1]["type"] == "tsumo"
-            assert self.events[-2] == previous_kan_dora_event
+            self.events.append(previous_kan_dora_event)
+            assert self.events[-1] == previous_kan_dora_event
+            assert self.events[-2]["type"] == "tsumo"
             assert self.events[-3]["type"] in {"kakan", "daiminkan"}
 
         self.logger.logger.info("At the end of win check, we returned list of events to its initial state:")
