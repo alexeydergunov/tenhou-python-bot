@@ -117,7 +117,12 @@ class MortalPlayer(Player):
             # if not successful, will be cleared on next hand
             self.events.append(mortal_helpers.successful_riichi(player_id=self.seat))
 
-        discarded_tile_136 = self.our_tiles_map[discarded_tile].pop()
+        if tsumogiri:
+            # tile ids are added to the end of this list
+            discarded_tile_136 = self.our_tiles_map[discarded_tile].pop()
+        else:
+            # remove tile that was in the hand from the earliest moment
+            discarded_tile_136 = self.our_tiles_map[discarded_tile].pop(0)
         super().discard_tile(discard_tile=discarded_tile_136, force_tsumogiri=force_tsumogiri)  # maintain table state
         return discarded_tile_136, with_riichi
 
@@ -200,9 +205,10 @@ class MortalPlayer(Player):
 
         discard_action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot discard action: %s", discard_action)
-        discard_tile: int = self.our_tiles_map[discard_action["pai"]][-1]  # will be popped in discard_tile()
+        discard_tile: int = self.our_tiles_map[discard_action["pai"]][0]  # will be popped in discard_tile(), pop(0) because not a tsumogiri
 
         consumed_tiles: list[int] = [self.our_tiles_map[t].pop() for t in call_action["consumed"]]
+        assert discard_tile not in consumed_tiles
         meld = Meld(meld_type=meld_type, tiles=consumed_tiles + [tile])
 
         self.events.pop()  # will be added in a client when we get a message about meld
