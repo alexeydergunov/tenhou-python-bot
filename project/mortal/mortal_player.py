@@ -103,7 +103,7 @@ class MortalPlayer(Player):
             with_riichi = True
             self.events.append(mortal_helpers.declare_riichi(player_id=self.seat))
             action = self.bot.react_one(events=self.events, with_meta=True)
-            self.logger.logger.info("Bot action: %s", action)
+            self.logger.logger.info("Bot action after riichi: %s", action)
 
         assert action["type"] == "dahai"
         discarded_tile: str = action["pai"]
