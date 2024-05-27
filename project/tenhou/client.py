@@ -3,6 +3,7 @@ import random
 import socket
 from threading import Thread
 from time import sleep
+from typing import Optional
 from urllib.parse import quote
 
 import requests
@@ -101,6 +102,7 @@ class TenhouClient(Client):
     def start_game(self):
         from mortal.mortal_player import MortalPlayer
         import mortal.mortal_helpers as mortal_helpers
+        from mortal.mortal_helpers import MortalEvent
 
         log_link = ""
 
@@ -472,11 +474,20 @@ class TenhouClient(Client):
                     is_tsumogiri = message[1].islower()
                     player_seat = self.decoder.get_enemy_seat(message)
                     if isinstance(self.player, MortalPlayer):
+                        # when enemies declare open or added kans, kandora event comes before their discards, we need to remove it
+                        previous_kan_dora_event: Optional[MortalEvent] = None
+                        if self.player.events[-1]["type"] == "tsumo" and self.player.events[-1]["actor"] == player_seat:
+                            if self.player.events[-2]["type"] == "dora":
+                                if self.player.events[-3]["type"] in {"kakan", "daiminkan"} and self.player.events[-3]["actor"] == player_seat:
+                                    previous_kan_dora_event = self.player.events[-2]
+                                    self.player.events.pop(-2)
                         self.player.events.append(mortal_helpers.discard_tile(
                             player_id=player_seat,
                             tile=mortal_helpers.convert_tile_to_mortal(tile_136=tile),
                             tsumogiri=is_tsumogiri,
                         ))
+                        if previous_kan_dora_event is not None:
+                            self.player.events.append(previous_kan_dora_event)
 
                     # open hand suggestions
                     if "t=" in message:

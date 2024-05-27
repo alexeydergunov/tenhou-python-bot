@@ -150,6 +150,14 @@ class MortalPlayer(Player):
         for event in self.events[-12:]:
             self.logger.logger.info("> %s", event)
 
+        # when enemies declare open or added kans, kandora event comes before their discards, we need to remove it
+        previous_kan_dora_event: Optional[MortalEvent] = None
+        if self.events[-1]["type"] == "tsumo" and self.events[-1]["actor"] == enemy_seat:
+            if self.events[-2]["type"] == "dora":
+                if self.events[-3]["type"] in {"kakan", "daiminkan"} and self.events[-3]["actor"] == enemy_seat:
+                    previous_kan_dora_event = self.events[-2]
+                    self.events.pop(-2)
+
         # client first check win, then actually draws/discards tile
         new_events = []
         if is_tsumo:
@@ -159,7 +167,7 @@ class MortalPlayer(Player):
             assert enemy_seat != self.seat
             if is_chankan:
                 # TODO: find out if kakan event is already added at this moment
-                if self.events[-1].get("type") != "kakan":
+                if self.events[-1]["type"] != "kakan":
                     new_events.append(mortal_helpers.added_kan(player_id=enemy_seat, tile=tile))
             else:
                 new_events.append(mortal_helpers.discard_tile(player_id=enemy_seat, tile=tile, tsumogiri=is_tsumogiri))
@@ -170,6 +178,11 @@ class MortalPlayer(Player):
 
         for _ in range(len(new_events)):
             self.events.pop()
+
+        # return to initial state
+        if previous_kan_dora_event is not None:
+            self.events.insert(-1, previous_kan_dora_event)
+            assert self.events[-2] == previous_kan_dora_event
 
         return action["type"] == "hora"
 
