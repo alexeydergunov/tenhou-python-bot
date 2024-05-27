@@ -19,7 +19,7 @@ def test_tile_conversion():
             if num == 5:
                 mortal_tiles_lists[-1][-1] += "r"
             index += 4
-    for num0, honor in enumerate("ESWNPFC"):
+    for honor in "ESWNPFC":
         tiles_136_lists.append(list(range(index, index + 4)))
         mortal_tiles_lists.append([honor] * 4)
         index += 4
