@@ -142,7 +142,7 @@ class MortalPlayer(Player):
         self.logger.logger.info("Called should_call_win(), tile: %s, is_tsumo: %s, enemy_seat: %s, is_chankan: %s, is_tsumogiri: %s",
                                 tile, is_tsumo, enemy_seat, is_chankan, is_tsumogiri)
         self.logger.logger.info("Last previous events:")
-        for event in self.events[-3:]:
+        for event in self.events[-12:]:
             self.logger.logger.info("> %s", event)
 
         # client first check win, then actually draws/discards tile
