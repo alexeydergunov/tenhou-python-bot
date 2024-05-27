@@ -135,6 +135,10 @@ class MortalPlayer(Player):
                         is_chankan: bool = False,
                         is_tsumogiri: bool = False) -> bool:
         self.logger.logger.info("Called should_call_win()")
+        self.logger.logger.info("Last previous events:")
+        for event in self.events[-3:]:
+            self.logger.logger.info("> %s", event)
+
         tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
 
         # client first check win, then actually draws/discards tile
