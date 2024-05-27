@@ -32,6 +32,10 @@ class MortalPlayer(Player):
         tiles.sort(key=lambda t: mortal_helpers.TILES.index(t))
         return tiles
 
+    def log_last_n_events(self, count: int):
+        for event in self.events[-count:]:
+            self.logger.logger.info("> %s", event)
+
     def erase_state(self):
         super().erase_state()
         self.events.clear()
@@ -82,8 +86,7 @@ class MortalPlayer(Player):
 
         self.logger.logger.info("Called draw_tile(), tile: %s", tile)
         self.logger.logger.info("Last previous events:")
-        for event in self.events[-3:]:
-            self.logger.logger.info("> %s", event)
+        self.log_last_n_events(count=3)
 
         self.our_tiles_map[tile].append(tile_136)
         event = mortal_helpers.draw_tile(player_id=self.seat, tile=tile)
@@ -92,8 +95,7 @@ class MortalPlayer(Player):
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
         self.logger.logger.info("Called discard_tile(), force_tsumogiri = %s", force_tsumogiri)
         self.logger.logger.info("Last previous events:")
-        for event in self.events[-12:]:
-            self.logger.logger.info("> %s", event)
+        self.log_last_n_events(count=12)
 
         action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot action: %s", action)
@@ -147,14 +149,15 @@ class MortalPlayer(Player):
         self.logger.logger.info("Called should_call_win(), tile: %s, is_tsumo: %s, enemy_seat: %s, is_chankan: %s, is_tsumogiri: %s",
                                 tile, is_tsumo, enemy_seat, is_chankan, is_tsumogiri)
         self.logger.logger.info("Last previous events:")
-        for event in self.events[-12:]:
-            self.logger.logger.info("> %s", event)
+        self.log_last_n_events(count=12)
 
         # when enemies declare open or added kans, kandora event comes before their discards, we need to remove it
         previous_kan_dora_event: Optional[MortalEvent] = None
         if self.events[-1]["type"] == "tsumo" and self.events[-1]["actor"] == enemy_seat:
             if self.events[-2]["type"] == "dora":
                 if self.events[-3]["type"] in {"kakan", "daiminkan"} and self.events[-3]["actor"] == enemy_seat:
+                    self.logger.logger.info("Found sequence %s -> dora -> tsumo before player %s discard in win check, move dora event after discard",
+                                            self.events[-3]["type"], enemy_seat)
                     previous_kan_dora_event = self.events[-2]
                     self.events.pop(-2)
 
@@ -182,7 +185,12 @@ class MortalPlayer(Player):
         # return to initial state
         if previous_kan_dora_event is not None:
             self.events.insert(-1, previous_kan_dora_event)
+            assert self.events[-1]["type"] == "tsumo"
             assert self.events[-2] == previous_kan_dora_event
+            assert self.events[-3]["type"] in {"kakan", "daiminkan"}
+
+        self.logger.logger.info("At the end of win check, we returned list of events to its initial state:")
+        self.log_last_n_events(count=6)
 
         return action["type"] == "hora"
 
@@ -195,8 +203,7 @@ class MortalPlayer(Player):
     def try_to_call_meld(self, tile: int, is_kamicha_discard: bool) -> tuple[Optional[Meld], Optional[int]]:
         self.logger.logger.info("Called try_to_call_meld()")
         self.logger.logger.info("Last previous events:")
-        for event in self.events[-3:]:
-            self.logger.logger.info("> %s", event)
+        self.log_last_n_events(count=3)
 
         call_action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot call action: %s", call_action)

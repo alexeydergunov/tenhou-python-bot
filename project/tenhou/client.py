@@ -479,6 +479,8 @@ class TenhouClient(Client):
                         if self.player.events[-1]["type"] == "tsumo" and self.player.events[-1]["actor"] == player_seat:
                             if self.player.events[-2]["type"] == "dora":
                                 if self.player.events[-3]["type"] in {"kakan", "daiminkan"} and self.player.events[-3]["actor"] == player_seat:
+                                    self.player.logger.logger.info("Found sequence %s -> dora -> tsumo before player %s discard, move dora event after discard",
+                                                                   self.player.events[-3]["type"], player_seat)
                                     previous_kan_dora_event = self.player.events[-2]
                                     self.player.events.pop(-2)
                         self.player.events.append(mortal_helpers.discard_tile(
@@ -488,6 +490,13 @@ class TenhouClient(Client):
                         ))
                         if previous_kan_dora_event is not None:
                             self.player.events.append(previous_kan_dora_event)
+                            self.player.logger.logger.info("Moved dora event after sequence %s -> tsumo -> dahai of player %s. Last events are:",
+                                                           self.player.events[-4]["type"], player_seat)
+                            self.player.log_last_n_events(count=12)
+                            assert self.player.events[-1] == previous_kan_dora_event
+                            assert self.player.events[-2]["type"] == "dahai"
+                            assert self.player.events[-3]["type"] == "tsumo"
+                            assert self.player.events[-4]["type"] in {"kakan", "daiminkan"}
 
                     # open hand suggestions
                     if "t=" in message:
