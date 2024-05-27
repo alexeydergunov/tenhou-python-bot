@@ -78,19 +78,19 @@ class MortalPlayer(Player):
 
     def draw_tile(self, tile_136: int):
         super().draw_tile(tile_136=tile_136)
+        tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
 
-        self.logger.logger.info("Called draw_tile()")
+        self.logger.logger.info("Called draw_tile(), tile: %s", tile)
         self.logger.logger.info("Last previous events:")
         for event in self.events[-3:]:
             self.logger.logger.info("> %s", event)
 
-        tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
         self.our_tiles_map[tile].append(tile_136)
         event = mortal_helpers.draw_tile(player_id=self.seat, tile=tile)
         self.events.append(event)
 
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
-        self.logger.logger.info("Called discard_tile()")
+        self.logger.logger.info("Called discard_tile(), force_tsumogiri = %s", force_tsumogiri)
         self.logger.logger.info("Last previous events:")
         for event in self.events[-12:]:
             self.logger.logger.info("> %s", event)
@@ -107,7 +107,10 @@ class MortalPlayer(Player):
 
         assert action["type"] == "dahai"
         discarded_tile: str = action["pai"]
-        event = mortal_helpers.discard_tile(player_id=self.seat, tile=discarded_tile, tsumogiri=force_tsumogiri)
+        tsumogiri: bool = action["tsumogiri"]
+        if force_tsumogiri:
+            assert tsumogiri is True
+        event = mortal_helpers.discard_tile(player_id=self.seat, tile=discarded_tile, tsumogiri=tsumogiri)
         self.events.append(event)
 
         if with_riichi:
@@ -134,12 +137,13 @@ class MortalPlayer(Player):
                         enemy_seat: Optional[int] = None,
                         is_chankan: bool = False,
                         is_tsumogiri: bool = False) -> bool:
-        self.logger.logger.info("Called should_call_win()")
+        tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
+
+        self.logger.logger.info("Called should_call_win(), tile: %s, is_tsumo: %s, enemy_seat: %s, is_chankan: %s, is_tsumogiri: %s",
+                                tile, is_tsumo, enemy_seat, is_chankan, is_tsumogiri)
         self.logger.logger.info("Last previous events:")
         for event in self.events[-3:]:
             self.logger.logger.info("> %s", event)
-
-        tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)
 
         # client first check win, then actually draws/discards tile
         new_events = []
