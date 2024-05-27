@@ -77,18 +77,22 @@ def discard_tile(player_id: int, tile: str, tsumogiri: bool) -> MortalEvent:
     return {"type": "dahai", "actor": player_id, "pai": tile, "tsumogiri": tsumogiri}
 
 
-def pon(player_id: int, from_whom: int, tile: str) -> MortalEvent:
+def pon(player_id: int, from_whom: int, tile: str, pon_tiles: list[str]) -> MortalEvent:
     assert 0 <= player_id <= 3
     assert 0 <= from_whom <= 3
     assert from_whom != player_id
     assert tile in TILES
-    return {"type": "pon", "actor": player_id, "target": from_whom, "pai": tile, "consumed": [tile, tile]}
+    assert len(pon_tiles) == 2
+    assert all(t in TILES for t in pon_tiles)
+    assert len(set(pon_tiles) | {tile}) <= 2  # can be red five
+    return {"type": "pon", "actor": player_id, "target": from_whom, "pai": tile, "consumed": pon_tiles}
 
 
 def chi(player_id: int, tile: str, chi_tiles: list[str]) -> MortalEvent:
     assert 0 <= player_id <= 3
     assert tile in TILES
     assert len(chi_tiles) == 2
+    assert all(t in TILES for t in chi_tiles)
     from_whom = player_id - 1
     if from_whom < 0:
         from_whom += 4
@@ -128,13 +132,25 @@ def skip() -> MortalEvent:
 def closed_kan(player_id: int, tile: str) -> MortalEvent:
     assert 0 <= player_id <= 3
     assert tile in TILES
-    return {"type": "ankan", "actor": player_id, "consumed": [tile, tile, tile, tile]}
+    consumed = [tile, tile, tile, tile]
+    if tile.startswith("5"):
+        consumed[-1] += "r"
+    assert all(t in TILES for t in consumed)
+    return {"type": "ankan", "actor": player_id, "consumed": consumed}
 
 
 def added_kan(player_id: int, tile: str) -> MortalEvent:
     assert 0 <= player_id <= 3
     assert tile in TILES
-    return {"type": "kakan", "actor": player_id, "pai": tile, "consumed": [tile, tile, tile]}
+    if tile.startswith("5"):
+        if tile.endswith("r"):
+            consumed = [tile[:-1], tile[:-1], tile[:-1]]
+        else:
+            consumed = [tile, tile, tile + "r"]
+    else:
+        consumed = [tile, tile, tile]
+    assert all(t in TILES for t in consumed)
+    return {"type": "kakan", "actor": player_id, "pai": tile, "consumed": consumed}
 
 
 def open_kan(player_id: int, from_whom: int, tile: str) -> MortalEvent:
@@ -142,7 +158,15 @@ def open_kan(player_id: int, from_whom: int, tile: str) -> MortalEvent:
     assert 0 <= from_whom <= 3
     assert player_id != from_whom
     assert tile in TILES
-    return {"type": "daiminkan", "actor": player_id, "target": from_whom, "pai": tile, "consumed": [tile, tile, tile]}
+    if tile.startswith("5"):
+        if tile.endswith("r"):
+            consumed = [tile[:-1], tile[:-1], tile[:-1]]
+        else:
+            consumed = [tile, tile, tile + "r"]
+    else:
+        consumed = [tile, tile, tile]
+    assert all(t in TILES for t in consumed)
+    return {"type": "daiminkan", "actor": player_id, "target": from_whom, "pai": tile, "consumed": consumed}
 
 
 def add_dora_marker(tile: str) -> MortalEvent:

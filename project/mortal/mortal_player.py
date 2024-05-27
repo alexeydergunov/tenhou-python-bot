@@ -195,10 +195,10 @@ class MortalPlayer(Player):
             self.events.append(mortal_helpers.chi(player_id=self.seat, tile=call_action["pai"], chi_tiles=call_action["consumed"]))
             meld_type = MeldPrint.CHI
         elif call_action["type"] == "pon":
-            self.events.append(mortal_helpers.pon(player_id=self.seat, tile=call_action["pai"], from_whom=call_action["target"]))
+            self.events.append(mortal_helpers.pon(player_id=self.seat, from_whom=call_action["target"], tile=call_action["pai"], pon_tiles=call_action["consumed"]))
             meld_type = MeldPrint.PON
         elif call_action["type"] == "daiminkan":
-            self.events.append(mortal_helpers.open_kan(player_id=self.seat, tile=call_action["pai"], from_whom=call_action["target"]))
+            self.events.append(mortal_helpers.open_kan(player_id=self.seat, from_whom=call_action["target"], tile=call_action["pai"]))
             meld_type = MeldPrint.KAN
         else:
             return None, None

@@ -106,7 +106,7 @@ def test_robbing_a_kan():
         mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),
         mortal_helpers.draw_unknown_tile(player_id=1),
         mortal_helpers.discard_tile(player_id=1, tile="6m", tsumogiri=False),
-        mortal_helpers.pon(player_id=3, from_whom=1, tile="6m"),
+        mortal_helpers.pon(player_id=3, from_whom=1, tile="6m", pon_tiles=["6m, 6m"]),
         mortal_helpers.discard_tile(player_id=3, tile="S", tsumogiri=False),
         mortal_helpers.draw_tile(player_id=0, tile="N"),
         mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),

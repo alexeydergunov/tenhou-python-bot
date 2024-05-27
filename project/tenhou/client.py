@@ -406,10 +406,13 @@ class TenhouClient(Client):
                                 chi_tiles=[mortal_helpers.convert_tile_to_mortal(tile_136=t) for t in chi_tiles],
                             ))
                         if meld.type == MeldPrint.PON:
+                            pon_tiles = list(meld.tiles)
+                            pon_tiles.remove(meld.called_tile)
                             self.player.events.append(mortal_helpers.pon(
                                 player_id=meld.who,
                                 from_whom=meld.from_who,
                                 tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
+                                pon_tiles=[mortal_helpers.convert_tile_to_mortal(tile_136=t) for t in pon_tiles],
                             ))
                         if meld.type == MeldPrint.KAN:
                             if meld.opened:
