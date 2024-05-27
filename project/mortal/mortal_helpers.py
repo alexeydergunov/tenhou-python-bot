@@ -29,25 +29,6 @@ def convert_tile_to_mortal(tile_136: int) -> str:
     return "ESWNPFC"[(tile_136 - 108) // 4]
 
 
-def convert_tile_from_mortal(tile: str) -> int:
-    if tile == "5mr":
-        return FIVE_RED_MAN
-    if tile == "5mp":
-        return FIVE_RED_PIN
-    if tile == "5ms":
-        return FIVE_RED_SOU
-    if tile[0].isdigit():
-        result = (int(tile[0]) - 1) * 4
-        if tile.endswith("m"):
-            return result
-        if tile.endswith("p"):
-            return result + 36
-        if tile.endswith("s"):
-            return result + 72
-    index = "ESWNPFC".index(tile)
-    return index * 4 + 108
-
-
 def start_game() -> MortalEvent:
     return {"type": "start_game"}
 
