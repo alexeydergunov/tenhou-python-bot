@@ -137,3 +137,149 @@ def test_cannot_robbing_a_closed_kan_13_orphans():
     ]
     action = MORTAL_BOT_0.react_one(events=events)
     assert action["type"] != "hora"
+
+
+def test_added_kan_on_red_five():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="9m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["5m", "5m", "2s", "3s", "4s", "5sr", "6s", "7s", "3p", "3p", "5p", "5pr", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="F"),
+        mortal_helpers.discard_tile(player_id=0, tile="F", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="5m", tsumogiri=False),
+        mortal_helpers.pon(player_id=0, from_whom=1, tile="5m", pon_tiles=["5m", "5m"]),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="N", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="5mr"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "kakan"
+    assert action["pai"] == "5mr"
+    assert action["consumed"] == ["5m", "5m", "5m"]
+
+
+def test_added_kan_on_normal_five_v1():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="9m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["5m", "5m", "2s", "3s", "4s", "5sr", "6s", "7s", "3p", "3p", "5p", "5pr", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="F"),
+        mortal_helpers.discard_tile(player_id=0, tile="F", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="5mr", tsumogiri=False),
+        mortal_helpers.pon(player_id=0, from_whom=1, tile="5mr", pon_tiles=["5m", "5m"]),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="N", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="5m"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "kakan"
+    assert action["pai"] == "5m"
+    assert sorted(action["consumed"]) == ["5m", "5m", "5mr"]
+
+
+def test_added_kan_on_normal_five_v2():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="9m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["5m", "5mr", "2s", "3s", "4s", "5sr", "6s", "7s", "3p", "3p", "5p", "5pr", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="F"),
+        mortal_helpers.discard_tile(player_id=0, tile="F", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="5mr", tsumogiri=False),
+        mortal_helpers.pon(player_id=0, from_whom=1, tile="5m", pon_tiles=["5m", "5mr"]),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="N", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="5m"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "kakan"
+    assert action["pai"] == "5m"
+    assert sorted(action["consumed"]) == ["5m", "5m", "5mr"]
+
+
+def test_closed_kan_on_five_v1():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="9m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["5m", "5m", "2s", "3s", "4s", "5sr", "6s", "7s", "3p", "3p", "5p", "5pr", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="5m"),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="N", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="N", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="5mr"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "ankan"
+    assert sorted(action["consumed"]) == ["5m", "5m", "5m", "5mr"]
+
+
+def test_closed_kan_on_five_v2():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="9m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["5m", "5m", "2s", "3s", "4s", "5sr", "6s", "7s", "3p", "3p", "5p", "5pr", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="5mr"),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="N", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="N", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="5m"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "ankan"
+    assert sorted(action["consumed"]) == ["5m", "5m", "5m", "5mr"]
+
+
+def test_open_kan_on_red_five():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="9m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["5m", "5m", "2s", "3s", "4s", "5s", "6s", "3p", "3p", "5pr", "6p", "P", "F"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="5m"),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="N", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="7s", tsumogiri=True),
+        mortal_helpers.chi(player_id=0, tile="7s", chi_tiles=["5s", "6s"]),
+        mortal_helpers.discard_tile(player_id=0, tile="F", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="5mr", tsumogiri=False),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    print(action)
+    assert action["type"] == "daiminkan"
+    assert action["pai"] == "5mr"
+    assert action["consumed"] == ["5m", "5m", "5m"]
