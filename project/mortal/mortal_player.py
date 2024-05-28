@@ -176,9 +176,7 @@ class MortalPlayer(Player):
             assert 0 <= enemy_seat <= 3
             assert enemy_seat != self.seat
             if is_chankan:
-                # TODO: find out if kakan event is already added at this moment
-                if self.events[-1]["type"] != "kakan":
-                    new_events.append(mortal_helpers.added_kan(player_id=enemy_seat, tile=tile))
+                assert self.events[-1]["type"] == "kakan"
             else:
                 new_events.append(mortal_helpers.discard_tile(player_id=enemy_seat, tile=tile, tsumogiri=is_tsumogiri))
 
