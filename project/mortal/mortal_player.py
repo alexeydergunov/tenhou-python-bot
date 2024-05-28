@@ -215,18 +215,12 @@ class MortalPlayer(Player):
         call_action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot call action: %s", call_action)
 
-        if call_action["type"] == "none":
-            return None, None
-
         if call_action["type"] == "chi":
             self.events.append(mortal_helpers.chi(player_id=self.seat, tile=call_action["pai"], chi_tiles=call_action["consumed"]))
             meld_type = MeldPrint.CHI
         elif call_action["type"] == "pon":
             self.events.append(mortal_helpers.pon(player_id=self.seat, from_whom=call_action["target"], tile=call_action["pai"], pon_tiles=call_action["consumed"]))
             meld_type = MeldPrint.PON
-        elif call_action["type"] == "daiminkan":
-            self.events.append(mortal_helpers.open_kan(player_id=self.seat, from_whom=call_action["target"], tile=call_action["pai"]))
-            meld_type = MeldPrint.KAN
         else:
             return None, None
 
