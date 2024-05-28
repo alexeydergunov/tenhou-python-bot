@@ -51,7 +51,7 @@ class MortalPlayer(Player):
             NORTH: "N",
         }[self.table.round_wind_tile]
         dora_marker: str = mortal_helpers.convert_tile_to_mortal(tile_136=self.table.dora_indicators[0])
-        round_id: int = self.table.round_wind_number // 4 + 1
+        round_id: int = self.table.round_wind_number % 4 + 1
         honba: int = self.table.count_of_honba_sticks
         riichi_sticks: int = self.table.count_of_riichi_sticks
         dealer_id: int = self.dealer_seat
