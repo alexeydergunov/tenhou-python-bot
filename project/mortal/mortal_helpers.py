@@ -134,7 +134,10 @@ def closed_kan(player_id: int, tile: str) -> MortalEvent:
     assert tile in TILES
     consumed = [tile, tile, tile, tile]
     if tile.startswith("5"):
-        consumed[-1] += "r"
+        if tile.endswith("r"):
+            consumed = [tile[:-1], tile[:-1], tile[:-1], tile]
+        else:
+            consumed = [tile, tile, tile, tile + "r"]
     assert all(t in TILES for t in consumed)
     return {"type": "ankan", "actor": player_id, "consumed": consumed}
 

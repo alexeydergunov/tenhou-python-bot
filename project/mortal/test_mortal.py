@@ -283,3 +283,42 @@ def test_open_kan_on_red_five():
     assert action["type"] == "daiminkan"
     assert action["pai"] == "5mr"
     assert action["consumed"] == ["5m", "5m", "5m"]
+
+
+def test_open_kan_event():
+    event = mortal_helpers.open_kan(player_id=0, from_whom=1, tile="E")
+    assert event["pai"] == "E"
+    assert event["consumed"] == ["E", "E", "E"]
+
+    event = mortal_helpers.open_kan(player_id=0, from_whom=1, tile="5m")
+    assert event["pai"] == "5m"
+    assert sorted(event["consumed"]) == ["5m", "5m", "5mr"]
+
+    event = mortal_helpers.open_kan(player_id=0, from_whom=1, tile="5mr")
+    assert event["pai"] == "5mr"
+    assert event["consumed"] == ["5m", "5m", "5m"]
+
+
+def test_added_kan_event():
+    event = mortal_helpers.added_kan(player_id=0, tile="E")
+    assert event["pai"] == "E"
+    assert event["consumed"] == ["E", "E", "E"]
+
+    event = mortal_helpers.added_kan(player_id=0, tile="5m")
+    assert event["pai"] == "5m"
+    assert sorted(event["consumed"]) == ["5m", "5m", "5mr"]
+
+    event = mortal_helpers.added_kan(player_id=0, tile="5mr")
+    assert event["pai"] == "5mr"
+    assert event["consumed"] == ["5m", "5m", "5m"]
+
+
+def test_closed_kan_event():
+    event = mortal_helpers.closed_kan(player_id=0, tile="E")
+    assert event["consumed"] == ["E", "E", "E", "E"]
+
+    event = mortal_helpers.closed_kan(player_id=0, tile="5m")
+    assert sorted(event["consumed"]) == ["5m", "5m", "5m", "5mr"]
+
+    event = mortal_helpers.closed_kan(player_id=0, tile="5mr")
+    assert sorted(event["consumed"]) == ["5m", "5m", "5m", "5mr"]
