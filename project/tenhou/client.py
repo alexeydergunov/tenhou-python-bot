@@ -309,9 +309,17 @@ class TenhouClient(Client):
                         self._send_message('<N type="9" />')
                         continue
 
-                    kan_type = self.player.should_call_kan(drawn_tile, False, main_player.in_riichi)
-                    if kan_type:
+                    kan_result = self.player.should_call_kan(drawn_tile, False, main_player.in_riichi)
+                    if kan_result is not None:
                         self._random_sleep(1, 1.5)
+
+                        if isinstance(kan_result, tuple):
+                            kan_type = kan_result[0]
+                            kan_tile = kan_result[1]
+                        else:
+                            kan_type = kan_result
+                            kan_tile = drawn_tile  # looks like old bot can only kan drawn tiles, but Mortal can do more
+                        assert isinstance(kan_tile, int)
 
                         if kan_type == MeldPrint.SHOUMINKAN:
                             meld_type = 5
@@ -320,7 +328,7 @@ class TenhouClient(Client):
                             meld_type = 4
                             self.logger.info("We called a closed kan set!")
 
-                        self._send_message('<N type="{}" hai="{}" />'.format(meld_type, drawn_tile))
+                        self._send_message('<N type="{}" hai="{}" />'.format(meld_type, kan_tile))
 
                         continue
 
@@ -510,7 +518,8 @@ class TenhouClient(Client):
 
                         # should we call a kan?
                         if 't="3"' in message or 't="7"' in message:
-                            if self.player.should_call_kan(tile, True):
+                            kan_result = self.player.should_call_kan(tile, True)
+                            if kan_result is not None:
                                 self._random_sleep(1, 2)
 
                                 # 2 is open kan
