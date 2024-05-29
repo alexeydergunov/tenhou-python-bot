@@ -95,6 +95,20 @@ def test_ron():
     assert action["target"] == 1
 
 
+def test_no_renhou():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=3, scores=[25000] * 4,
+            start_hands=[["1m", "2m", "3m", "7m", "7m", "7m", "2p", "3p", "4p", "7s", "9s", "E", "E"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="8s", tsumogiri=False),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] != "hora"
+
+
 def test_robbing_a_kan():
     events: list[MortalEvent] = [
         mortal_helpers.start_game(),
