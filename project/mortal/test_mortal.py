@@ -440,3 +440,76 @@ def test_temporary_furiten():
     assert action["type"] == "hora"
     assert action["actor"] == 0
     assert action["target"] == 1
+
+
+def test_allowed_kan_under_riichi():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["1m", "2m", "3m", "7m", "7m", "7m", "2p", "3p", "4p", "7s", "9s", "E", "E"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="N"),
+        mortal_helpers.declare_riichi(player_id=0),
+        mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),
+        mortal_helpers.successful_riichi(player_id=0),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="S", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="7m"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "ankan"
+    assert action["consumed"] == ["7m", "7m", "7m", "7m"]
+
+
+def test_allowed_kan_under_riichi_online():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["6m", "6m", "6m", "7m", "7m", "7m", "8m", "8m", "8m", "7s", "9s", "E", "E"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="N"),
+        mortal_helpers.declare_riichi(player_id=0),
+        mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),
+        mortal_helpers.successful_riichi(player_id=0),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="S", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="7m"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "ankan"  # allowed online, but usually prohibited IRL
+    assert action["consumed"] == ["7m", "7m", "7m", "7m"]
+
+
+def test_prohibited_kan_under_riichi():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["7m", "7m", "7m", "9m", "2p", "3p", "4p", "7s", "8s", "9s", "W", "W", "W"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="N"),
+        mortal_helpers.declare_riichi(player_id=0),
+        mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),
+        mortal_helpers.successful_riichi(player_id=0),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="S", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="7m"),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "dahai"
+    assert action["pai"] == "7m"
+    assert action["tsumogiri"] is True
