@@ -367,3 +367,76 @@ def test_closed_kan_event():
 
     event = mortal_helpers.closed_kan(player_id=0, tile="5mr")
     assert sorted(event["consumed"]) == ["5m", "5m", "5m", "5mr"]
+
+
+def test_furiten():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["1m", "2m", "3m", "7m", "7m", "2p", "2p", "7s", "8s", "9s", "E", "E", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="N"),
+        mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="7m", tsumogiri=False),
+        mortal_helpers.pon(player_id=0, from_whom=1, tile="7m", pon_tiles=["7m", "7m"]),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="S", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="S", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="2p"),  # cannot win - no yaku
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] != "hora"
+
+    events.extend([
+        mortal_helpers.discard_tile(player_id=0, tile="2p", tsumogiri=True),  # enter furiten
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="E", tsumogiri=False),  # in furiten
+    ])
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] != "hora"
+
+
+def test_temporary_furiten():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=0, scores=[25000] * 4,
+            start_hands=[["1m", "2m", "3m", "7m", "7m", "2p", "2p", "7s", "8s", "9s", "E", "E", "P"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_tile(player_id=0, tile="N"),
+        mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="7m", tsumogiri=False),
+        mortal_helpers.pon(player_id=0, from_whom=1, tile="7m", pon_tiles=["7m", "7m"]),
+        mortal_helpers.discard_tile(player_id=0, tile="P", tsumogiri=False),
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="2p", tsumogiri=False),  # no yaku - enter temporary furiten
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] != "hora"
+
+    events.extend([
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="E", tsumogiri=False),  # in temporary furiten
+    ])
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] != "hora"
+
+    events.extend([
+        mortal_helpers.draw_unknown_tile(player_id=3),
+        mortal_helpers.discard_tile(player_id=3, tile="S", tsumogiri=True),
+        mortal_helpers.draw_tile(player_id=0, tile="N"),
+        mortal_helpers.discard_tile(player_id=0, tile="N", tsumogiri=True),  # leave temporary furiten
+        mortal_helpers.draw_unknown_tile(player_id=1),
+        mortal_helpers.discard_tile(player_id=1, tile="E", tsumogiri=True),  # can win now
+    ])
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "hora"
+    assert action["actor"] == 0
+    assert action["target"] == 1
