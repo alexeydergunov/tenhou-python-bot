@@ -153,6 +153,38 @@ def test_cannot_robbing_a_closed_kan_13_orphans():
     assert action["type"] != "hora"
 
 
+def test_seat_wind():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="E", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=2, scores=[25000] * 4,
+            start_hands=[["1m", "2m", "3m", "7m", "7m", "7m", "2p", "2p", "7s", "8s", "9s", "W", "W"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="W", tsumogiri=True),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "hora"
+    assert action["actor"] == 0
+    assert action["target"] == 2
+
+
+def test_round_wind():
+    events: list[MortalEvent] = [
+        mortal_helpers.start_game(),
+        mortal_helpers.start_hand(
+            round_wind="S", dora_marker="5m", round_id=1, honba=0, riichi_sticks=0, dealer_id=2, scores=[25000] * 4,
+            start_hands=[["1m", "2m", "3m", "7m", "7m", "7m", "2p", "2p", "7s", "8s", "9s", "S", "S"], ["?"] * 13, ["?"] * 13, ["?"] * 13],
+        ),
+        mortal_helpers.draw_unknown_tile(player_id=2),
+        mortal_helpers.discard_tile(player_id=2, tile="S", tsumogiri=True),
+    ]
+    action = MORTAL_BOT_0.react_one(events=events)
+    assert action["type"] == "hora"
+    assert action["actor"] == 0
+    assert action["target"] == 2
+
+
 def test_added_kan_on_red_five():
     events: list[MortalEvent] = [
         mortal_helpers.start_game(),
