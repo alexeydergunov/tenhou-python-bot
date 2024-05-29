@@ -293,7 +293,6 @@ def test_open_kan_on_red_five():
         mortal_helpers.discard_tile(player_id=1, tile="5mr", tsumogiri=False),
     ]
     action = MORTAL_BOT_0.react_one(events=events)
-    print(action)
     assert action["type"] == "daiminkan"
     assert action["pai"] == "5mr"
     assert action["consumed"] == ["5m", "5m", "5m"]
