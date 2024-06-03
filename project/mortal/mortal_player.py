@@ -91,9 +91,11 @@ class MortalPlayer(Player):
         self.our_tiles_map[tile].append(tile_136)
         event = mortal_helpers.draw_tile(player_id=self.seat, tile=tile)
         self.events.append(event)
+        self.logger.logger.info("Our closed tiles after draw_tile(): %s", self.get_our_tiles_list())
 
     def discard_tile(self, discard_tile: Optional[int] = None, force_tsumogiri: bool = False) -> tuple[int, bool]:
         self.logger.logger.info("Called discard_tile(), force_tsumogiri = %s", force_tsumogiri)
+        self.logger.logger.info("Our closed tiles before discard_tile(): %s", self.get_our_tiles_list())
         self.logger.logger.info("Last previous events:")
         self.log_last_n_events(count=12)
 
@@ -229,6 +231,11 @@ class MortalPlayer(Player):
         consumed_tiles: list[int] = [self.our_tiles_map[t].pop() for t in call_action["consumed"]]
         assert discard_tile not in consumed_tiles
         meld = Meld(meld_type=meld_type, tiles=consumed_tiles + [tile])
+
+        # add tiles back - they will be deleted later in client's code
+        # reason: if we call a chi, someone may call a pon, and out chi becomes invalid
+        for tile_136 in reversed(consumed_tiles):
+            self.our_tiles_map[mortal_helpers.convert_tile_to_mortal(tile_136=tile_136)].append(tile_136)
 
         self.events.pop()  # will be added in a client when we get a message about meld
         return meld, discard_tile

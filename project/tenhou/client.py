@@ -442,6 +442,17 @@ class TenhouClient(Client):
                                 tile=mortal_helpers.convert_tile_to_mortal(tile_136=meld.called_tile),
                             ))
 
+                        if meld.who == 0:
+                            # remove tile indices from mortal player's tiles map
+                            # we just added a call event to the end of the events list
+                            if self.player.events[-1]["type"] == "kakan":
+                                added_tile: str = self.player.events[-1]["pai"]
+                                self.player.our_tiles_map[added_tile].pop()
+                            else:
+                                consumed_tiles: list[str] = self.player.events[-1]["consumed"]
+                                for consumed_tile in consumed_tiles:
+                                    self.player.our_tiles_map[consumed_tile].pop()
+
                     # tenhou confirmed that we called a meld
                     # we had to do discard after this
                     if meld.who == 0:
