@@ -237,11 +237,12 @@ class TenhouDecoder:
         return result and result[0] or None
 
     def try_parse_enemy_draw_message(self, message):
-        if message.startswith("<U"):
+        message = message.replace(" ", "")
+        if message == "<U/>":
             return 1
-        if message.startswith("<V"):
+        if message == "<V/>":
             return 2
-        if message.startswith("<W"):
+        if message == "<W/>":
             return 3
         return None
 
