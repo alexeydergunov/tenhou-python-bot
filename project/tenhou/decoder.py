@@ -236,14 +236,15 @@ class TenhouDecoder:
         result = re.findall(r'{}="([^"]*)"'.format(attribute_name), message)
         return result and result[0] or None
 
-    def try_parse_enemy_draw_message(self, message):
-        message = message.replace(" ", "")
-        if message == "<U/>":
-            return 1
-        if message == "<V/>":
-            return 2
-        if message == "<W/>":
-            return 3
+    def try_parse_enemy_draw_message(self, message: str):
+        if message.startswith("<U") or message.startswith("<V") or message.startswith("<W"):
+            message = message.replace(" ", "")
+            if message == "<U/>":
+                return 1
+            if message == "<V/>":
+                return 2
+            if message == "<W/>":
+                return 3
         return None
 
     def is_discarded_tile_message(self, message):
