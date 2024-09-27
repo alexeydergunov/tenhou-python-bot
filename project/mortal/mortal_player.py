@@ -130,8 +130,23 @@ class MortalPlayer(Player):
         super().discard_tile(discard_tile=discarded_tile_136, force_tsumogiri=force_tsumogiri)  # maintain table state
         return discarded_tile_136, with_riichi
 
+    def quick_check_closed_kan_possibility(self, drawn_tile_136: int) -> bool:
+        self.logger.logger.info("Started quick_check_closed_kan()")
+        tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=drawn_tile_136)
+        assert drawn_tile_136 in self.our_tiles_map[tile]
+        if tile.endswith("r"):
+            tile = tile[:-1]
+        if tile.startswith("5"):
+            return len(self.our_tiles_map[tile]) == 3 and len(self.our_tiles_map[tile + "r"]) == 1
+        else:
+            return len(self.our_tiles_map[tile]) == 4
+
     def should_call_kan(self, drawn_tile_136: int, open_kan: bool, from_riichi: bool = False) -> Optional[tuple[str, int]]:
         self.logger.logger.info("Called should_call_kan()")
+        if from_riichi:
+            if not self.quick_check_closed_kan_possibility(drawn_tile_136=drawn_tile_136):
+                self.logger.logger.info("Cannot declare closed kan under riichi, don't ask bot")
+                return None
         action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot action: %s", action)
         if action["type"] in {"ankan", "daiminkan", "kakan"}:
