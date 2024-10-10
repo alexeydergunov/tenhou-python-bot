@@ -147,6 +147,8 @@ class MortalPlayer(Player):
             if not self.quick_check_closed_kan_possibility(drawn_tile_136=drawn_tile_136):
                 self.logger.logger.info("Cannot declare closed kan under riichi, don't ask bot")
                 return None
+            else:
+                self.logger.logger.info("Can declare closed kan under riichi, ask bot")
         action = self.bot.react_one(events=self.events, with_meta=True)
         self.logger.logger.info("Bot action: %s", action)
         if action["type"] in {"ankan", "daiminkan", "kakan"}:
