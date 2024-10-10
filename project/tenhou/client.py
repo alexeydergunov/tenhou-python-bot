@@ -283,7 +283,10 @@ class TenhouClient(Client):
 
                 # draw tile message
                 if "<T" in message:
-                    self._random_sleep(0.5, 1)
+                    if main_player.in_riichi:
+                        self._random_sleep(0.1, 0.2)
+                    else:
+                        self._random_sleep(0.5, 1)
 
                     drawn_tile = self.decoder.parse_tile(message)
                     self.table.count_of_remaining_tiles -= 1
