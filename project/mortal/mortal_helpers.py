@@ -10,6 +10,11 @@ TILES = [
     "P", "F", "C",  # white, greed, red
 ]
 
+TERMINAL_TILES_SET = {
+    "1m", "9m", "1p", "9p", "1s", "9s",
+    "E", "S", "W", "N", "P", "F", "C",
+}
+
 MortalEvent = dict[str, Any]
 
 

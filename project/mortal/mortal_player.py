@@ -130,6 +130,86 @@ class MortalPlayer(Player):
         super().discard_tile(discard_tile=discarded_tile_136, force_tsumogiri=force_tsumogiri)  # maintain table state
         return discarded_tile_136, with_riichi
 
+    @staticmethod
+    def quick_check_13_orphans(counts: dict[str, int]) -> bool:
+        counts_counts = defaultdict(int)
+        for tile, count in counts.items():
+            if tile not in mortal_helpers.TERMINAL_TILES_SET:
+                return False
+            counts_counts[count] += 1
+        return counts_counts[1] == 12 and counts_counts[2] == 1
+
+    @staticmethod
+    def quick_check_7_pairs(counts: dict[str, int]) -> bool:
+        counts_counts = defaultdict(int)
+        for count in counts.values():
+            counts_counts[count] += 1
+        return counts_counts[2] == 7
+
+    @staticmethod
+    def can_divide_into_sets(numbers: list[int]) -> bool:
+        assert len(numbers) in {0, 3, 6, 9, 12}
+        while len(numbers) > 0:
+            if numbers[0] == numbers[1] == numbers[2]:
+                # greedily remove a pon
+                numbers = numbers[3:]
+                continue
+            x = numbers[0]
+            numbers.pop(0)
+            if x + 1 in numbers:
+                i = numbers.index(x + 1)
+                numbers.pop(i)
+            else:
+                return False
+            if x + 2 in numbers:
+                i = numbers.index(x + 2)
+                numbers.pop(i)
+            else:
+                return False
+        return True
+
+    @staticmethod
+    def quick_check_winning_hand_structure(hand: list[str]) -> bool:
+        assert len(hand) in {2, 5, 8, 11, 14}
+        for i in range(len(hand)):
+            if hand[i].endswith("r"):
+                hand[i] = hand[i][:-1]
+            assert 1 <= len(hand[i]) <= 2
+
+        counts = defaultdict(int)
+        for tile in hand:
+            counts[tile] += 1
+
+        if MortalPlayer.quick_check_13_orphans(counts=counts):
+            return True
+        if MortalPlayer.quick_check_7_pairs(counts=counts):
+            return True
+
+        pair_candidates = [tile for tile in counts.keys() if counts[tile] >= 2]
+        for paired_tile in pair_candidates:
+            numbers_by_suit = defaultdict(list)
+            for tile, count in counts.items():
+                real_count = count - 2 if tile == paired_tile else count
+                suit = tile[-1]
+                digit = int(tile[0]) if len(tile) == 2 else 1
+                for i in range(real_count):
+                    numbers_by_suit[suit].append(digit)
+            total_length = sum(len(v) for v in numbers_by_suit.values())
+            assert total_length == len(hand) - 2
+            is_valid = True
+            for suit, numbers in numbers_by_suit.items():
+                assert len(numbers) > 0
+                if len(numbers) % 3 != 0:
+                    is_valid = False
+                    break
+                numbers.sort()
+                if not MortalPlayer.can_divide_into_sets(numbers=numbers):
+                    is_valid = False
+                    break
+            if is_valid:
+                return True
+        return False
+
     def quick_check_closed_kan_possibility(self, drawn_tile_136: int) -> bool:
         self.logger.logger.info("Started quick_check_closed_kan()")
         tile: str = mortal_helpers.convert_tile_to_mortal(tile_136=drawn_tile_136)
@@ -176,6 +256,14 @@ class MortalPlayer(Player):
                                 tile, is_tsumo, enemy_seat, is_chankan, is_tsumogiri)
         self.logger.logger.info("Last previous events:")
         self.log_last_n_events(count=12)
+
+        if is_tsumo:
+            hand: list[str] = sorted(self.get_our_tiles_list() + [tile])
+            if not self.quick_check_winning_hand_structure(hand=hand):
+                self.logger.logger.info("Not a winning hand structure, don't ask bot")
+                return False
+            else:
+                self.logger.logger.info("It's a winning hand structure, ask bot")
 
         # when enemies declare open or added kans, kandora event comes before their discards, we need to remove it
         previous_kan_dora_event: Optional[MortalEvent] = None
