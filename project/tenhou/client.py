@@ -356,6 +356,7 @@ class TenhouClient(Client):
                         self._random_sleep(1, 1.5)
                         self._send_message('<REACH hai="{}" />'.format(discarded_tile))
                         main_player.in_riichi = True
+                        self._random_sleep(0.2, 0.3)
 
                     self._send_message('<D p="{}"/>'.format(discarded_tile))
                     self.logger.info(
