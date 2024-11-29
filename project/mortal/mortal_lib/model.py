@@ -407,7 +407,7 @@ def load_model(seat: int) -> Bot:
         enable_quick_eval = False,
         enable_rule_based_agari_guard = True,
         name = 'mortal',
-        version= 4
+        version = version,
     )
 
     bot = Bot(engine, seat)
