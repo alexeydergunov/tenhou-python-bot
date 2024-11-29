@@ -387,10 +387,14 @@ def load_model(seat: int) -> Bot:
 
     # latest binary model
     control_state_file = os.path.join(os.path.dirname(__file__), "mortal.pth")
-
-    mortal = Brain(version=4, conv_channels=192, num_blocks=40).eval()
-    dqn = DQN(version=4).eval()
     state = torch.load(control_state_file, map_location=torch.device('cpu'))
+
+    version = state['config']['control']['version']
+    conv_channels = state['config']['resnet']['conv_channels']
+    num_blocks = state['config']['resnet']['num_blocks']
+
+    mortal = Brain(version=version, conv_channels=conv_channels, num_blocks=num_blocks).eval()
+    dqn = DQN(version=version).eval()
     mortal.load_state_dict(state['mortal'])
     dqn.load_state_dict(state['current_dqn'])
 
