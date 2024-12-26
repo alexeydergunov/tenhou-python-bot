@@ -7,9 +7,8 @@ from mortal.mortal_helpers import MortalEvent
 
 
 # usage:
-# cd project
-# python3 mortal/mortal_analyze_log.py 2 < mortal/log_examples/example_1.jsonl
-# python3 mortal/mortal_analyze_log.py 2 < mortal/log_examples/example_2.jsonl
+# python3 project/mortal_analyze_log.py 2 < project/mortal/log_examples/example_1.jsonl
+# python3 project/mortal_analyze_log.py 2 < project/mortal/log_examples/example_2.jsonl
 # (where 2 is player_id, from 0 to 3)
 def main():
     player_id = int(sys.argv[1])
