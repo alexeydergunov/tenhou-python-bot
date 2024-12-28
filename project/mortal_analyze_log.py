@@ -18,10 +18,13 @@ def main():
 
     events: list[MortalEvent] = []
     for line in sys.stdin:
-        event: MortalEvent = json.loads(line.strip())
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        event: MortalEvent = json.loads(line)
         events.append(event)
 
-    for return_action in bot.react_all(events=events, with_meta=False):
+    for return_action in bot.react_all(events=events, with_meta=True):
         return_action_str = json.dumps(return_action, separators=(",", ":"))
         sys.stdout.write(return_action_str + "\n")
         sys.stdout.flush()
