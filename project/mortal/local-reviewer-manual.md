@@ -4,15 +4,15 @@ Tested on Ubuntu 24.04.1 LTS.
 
 - Download https://github.com/Equim-chan/mjai-reviewer, build it as in its docs: `cargo build --release`
 
-- Download https://github.com/Equim-chan/Mortal, copy directory Mortal/mortal from to mjai-reviewer/target/release
+- Download https://github.com/Equim-chan/Mortal, copy directory Mortal/mortal to mjai-reviewer/target/release _(or make a symlink)_
 
 - Copy mortal.pth and libriichi.so (you must already have them) to mjai-reviewer/target/release/mortal
 
-- In mjai-reviewer/target/release/mortal, copy project.example.toml to project.toml
+- In mjai-reviewer/target/release/mortal, copy config.example.toml to config.toml
 
-- In mjai-reviewer/target/release/mortal, edit project.toml: `state_file = './mortal.pth'`
+- In mjai-reviewer/target/release/mortal, edit config.toml: `state_file = './mortal.pth'`
 
-- Create venv in mjai-reviewer/target/release/mortal: `python3 -m venv ./venv`
+- Create venv in mjai-reviewer/target/release/mortal: `python3 -m venv ./venv` _(or you can use existing venv or system interpreter)_
 
 - Install packages to venv: `venv/bin/pip3 install torch==2.5.1 numpy==2.2.1 tensorboard==2.18.0 tqdm==4.67.1 toml==0.10.2`
 
