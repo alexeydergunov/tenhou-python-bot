@@ -63,25 +63,35 @@ def main():
             os.mkdir(review_subdir)
         for i, url in enumerate(urls):
             output_file = os.path.join(review_subdir, get_html_file_name(tenhou_url=url))
-            print(f"Analyzing url {url} ({i + 1} / {len(urls)})...")
-            t1 = time.time()
-            code = subprocess.call(
-                args=[
-                    mjai_reviewer_exec,
-                    "-e", "mortal",
-                    "--show-rating",
-                    "-u", url.replace("/3/", "/0/"),
-                    "--no-open",
-                    "-o", output_file
-                ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                cwd=mjai_reviewer_release_dir,
-            )
-            t2 = time.time()
+            print(f"Analyzing url {url} ({i + 1} / {len(urls)})...", flush=True)
+            if os.path.exists(output_file) and os.path.getsize(output_file) > 0:
+                print(f"Url {i + 1} / {len(urls)} already exists")
+            else:
+                t1 = time.time()
+                try:
+                    code = subprocess.call(
+                        args=[
+                            mjai_reviewer_exec,
+                            "-e", "mortal",
+                            "--show-rating",
+                            "-u", url.replace("/3/", "/0/"),
+                            "--no-open",
+                            "-o", output_file
+                        ],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        cwd=mjai_reviewer_release_dir,
+                    )
+                except Exception as e:
+                    print(f"Couldn't parse url {i + 1} / {len(urls)}. Exception: {e}")
+                    continue
+                if code != 0:
+                    print(f"Couldn't parse url {i + 1} / {len(urls)}. Code: {code}")
+                    continue
+                t2 = time.time()
+                print(f"Review of url {i + 1} / {len(urls)} completed in {t2 - t1:.3f} sec")
             rating = extract_rating(html_file=output_file)
-            print(f"Url {i + 1} / {len(urls)} completed in {t2 - t1:.3f} sec with code {code}, "
-                  f"rating = {rating}, output file {output_file}", flush=True)
+            print(f"Url {i + 1} / {len(urls)} rating = {rating}, output file {output_file}", flush=True)
 
 
 if __name__ == "__main__":
