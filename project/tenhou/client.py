@@ -499,7 +499,7 @@ class TenhouClient(Client):
                     if isinstance(self.player, MortalPlayer):
                         # when enemies declare open or added kans, kandora event comes before their discards, we need to remove it
                         previous_kan_dora_event: Optional[MortalEvent] = None
-                        if self.player.events[-1]["type"] == "dora":
+                        if len(self.player.events) > 0 and self.player.events[-1]["type"] == "dora":
                             if self.player.events[-2]["type"] == "tsumo" and self.player.events[-2]["actor"] == player_seat:
                                 if self.player.events[-3]["type"] in {"kakan", "daiminkan"} and self.player.events[-3]["actor"] == player_seat:
                                     self.player.logger.logger.info("Found sequence %s -> tsumo -> dora before player %s discard, move dora event after discard",
